@@ -1,259 +1,158 @@
-const {
-    gsap,
-    gsap: { to, timeline, set, delayedCall },
-    Splitting,
-  } = window
-  
-  Splitting()
-  
-  const BTN = document.querySelector('.birthday-button__button')
-  const SOUNDS = {
-    CHEER: new Audio(
-      './data/cheer.mp3'
-    ),
-    MATCH: new Audio(
-      './data/match-strike-trimmed.mp3'
-    ),
-    TUNE: new Audio(
-      './data/happy-birthday-trimmed.mp3'
-    ),
-    ON: new Audio('./data/switch-on.mp3'),
-    BLOW: new Audio(
-      './data/blow-out.mp3'
-    ),
-    POP: new Audio(
-      './data/pop-trimmed.mp3'
-    ),
-    HORN: new Audio(
-      './data/horn.mp3'
-    ),
+// helper functions
+const PI2 = Math.PI * 2
+const random = (min, max) => Math.random() * (max - min + 1) + min | 0
+const timestamp = _ => new Date().getTime()
+
+// container
+class Birthday {
+  constructor() {
+    this.resize()
+
+    // create a lovely place to store the firework
+    this.fireworks = []
+    this.counter = 0
+
   }
   
-  const EYES = document.querySelector('.cake__eyes')
-  const BLINK = eyes => {
-    gsap.set(eyes, { scaleY: 1 })
-    if (eyes.BLINK_TL) eyes.BLINK_TL.kill()
-    eyes.BLINK_TL = new gsap.timeline({
-      delay: Math.floor(Math.random() * 4) + 1,
-      onComplete: () => BLINK(eyes),
-    })
-    eyes.BLINK_TL.to(eyes, {
-      duration: 0.05,
-      transformOrigin: '50% 50%',
-      scaleY: 0,
-      yoyo: true,
-      repeat: 1,
-    })
-  }
-  BLINK(EYES)
-  
-  const FROSTING_TL = () =>
-    timeline()
-      .to(
-        '#frosting',
-        {
-          scaleX: 1.015,
-          duration: 0.25,
-        },
-        0
-      )
-      .to(
-        '#frosting',
-        {
-          scaleY: 1,
-          duration: 1,
-        },
-        0
-      )
-      .to(
-        '#frosting',
-        {
-          duration: 1,
-          morphSVG: '.cake__frosting--end',
-        },
-        0
-      )
-  // Extract to sprinkle
-  const SPRINKLES_TL = () =>
-    timeline().to('.cake__sprinkle', { scale: 1, duration: 0.06, stagger: 0.02 })
-  // Extract out to your own timeline
-  const SPIN_TL = () =>
-    timeline()
-      .set('.cake__frosting-patch', { display: 'block' })
-      .to(
-        ['.cake__frosting--duplicate', '.cake__sprinkles--duplicate'],
-        { x: 0, duration: 1 },
-        0
-      )
-      .to(
-        ['.cake__frosting--start', '.cake__sprinkles--initial'],
-        { x: 65, duration: 1 },
-        0
-      )
-      .to('.cake__face', { duration: 1, x: -48.82 }, 0)
-  
-  const flickerSpeed = 0.1
-  const FLICKER_TL = timeline()
-    .to('.candle__flame-outer', {
-      duration: flickerSpeed,
-      repeat: -1,
-      yoyo: true,
-      morphSVG: '#flame-outer',
-    })
-    .to(
-      '.candle__flame-inner',
-      {
-        duration: flickerSpeed,
-        repeat: -1,
-        yoyo: true,
-        morphSVG: '#flame-inner',
-      },
-      0
-    )
-  
-  const SHAKE_TL = () =>
-    timeline({ delay: 0.5 })
-      .set('.cake__face', { display: 'none' })
-      .set('.cake__face--straining', { display: 'block' })
-      .to(
-        '.birthday-button',
-        {
-          onComplete: () => {
-            set('.cake__face--straining', { display: 'none' })
-            set('.cake__face', { display: 'block' })
-          },
-          x: 1,
-          y: 1,
-          repeat: 13,
-          duration: 0.1,
-        },
-        0
-      )
-      .to(
-        '.cake__candle',
-        {
-          onComplete: () => {
-            FLICKER_TL.play()
-          },
-          onStart: () => {
-            SOUNDS.POP.play()
-            delayedCall(0.2, () => SOUNDS.POP.play())
-            delayedCall(0.4, () => SOUNDS.POP.play())
-          },
-          ease: 'Elastic.easeOut',
-          duration: 0.2,
-          stagger: 0.2,
-          scaleY: 1,
-        },
-        0.2
-      )
-  const FLAME_TL = () =>
-    timeline({})
-      .to('.cake__candle', { '--flame': 1, stagger: 0.2, duration: 0.1 })
-      .to('body', { '--flame': 1, '--lightness': 5, duration: 0.2, delay: 0.2 })
-  const LIGHTS_OUT = () =>
-    timeline().to('body', {
-      onStart: () => SOUNDS.BLOW.play(),
-      delay: 0.5,
-      '--lightness': 0,
-      duration: 0.1,
-      '--glow-saturation': 0,
-      '--glow-lightness': 0,
-      '--glow-alpha': 1,
-      '--transparency-alpha': 1,
-    })
-  
-  const RESET = () => {
-    set('.char', {
-      '--hue': () => Math.random() * 360,
-      '--char-sat': 0,
-      '--char-light': 0,
-      x: 0,
-      y: 0,
-      opacity: 1,
-    })
-    set('body', {
-      '--frosting-hue': Math.random() * 360,
-      '--glow-saturation': 50,
-      '--glow-lightness': 35,
-      '--glow-alpha': 0.4,
-      '--transparency-alpha': 0,
-      '--flame': 0,
-    })
-    set('.cake__candle', { '--flame': 0 })
-    to('body', {
-      '--lightness': 50,
-      duration: 0.25,
-    })
-    // SET THESE
-    set('.cake__frosting--end', { opacity: 0 })
-    set('#frosting', {
-      transformOrigin: '50% 10%',
-      scaleX: 0,
-      scaleY: 0,
-    })
-    set('.cake__frosting-patch', { display: 'none' })
-    set(['.cake__frosting--duplicate', '.cake__sprinkles--duplicate'], { x: -65 })
-    set('.cake__face', { x: -110 })
-    set('.cake__face--straining', { display: 'none' })
-    set('.cake__sprinkle', {
-      '--sprinkle-hue': () => Math.random() * 360,
-      scale: 0,
-      transformOrigin: '50% 50%',
-    })
-    set('.birthday-button', { scale: 0.6, x: 0, y: 0 })
-    set('.birthday-button__cake', { display: 'none' })
-    set('.cake__candle', { scaleY: 0, transformOrigin: '50% 100%' })
-  }
-  RESET()
-  const MASTER_TL = timeline({
-    onStart: () => {
-      SOUNDS.ON.play()
-    },
-    onComplete: () => {
-      delayedCall(2, RESET)
-      BTN.removeAttribute('disabled')
-    },
-    paused: true,
-  })
-    .set('.birthday-button__cake', { display: 'block' })
-    .to('.birthday-button', {
-      onStart: () => SOUNDS.CHEER.play(),
-      scale: 1,
-      duration: 0.2,
-    })
-    .to('.char', { '--char-sat': 70, '--char-light': 65, duration: 0.2 }, 0)
-    .to('.char', {
-      onStart: () => SOUNDS.HORN.play(),
-      delay: 0.75,
-      y: () => gsap.utils.random(-100, -200),
-      x: () => gsap.utils.random(-50, 50),
-      duration: () => gsap.utils.random(0.5, 1),
-    })
-    .to('.char', { opacity: 0, duration: 0.25 }, '>-0.5')
-    .add(FROSTING_TL())
-    .add(SPRINKLES_TL())
-    .add(SPIN_TL())
-    .add(SHAKE_TL())
-    .add(FLAME_TL(), 'FLAME_ON')
-    .add(LIGHTS_OUT(), 'LIGHTS_OUT')
-  
-  SOUNDS.TUNE.onended = SOUNDS.MATCH.onended = () => MASTER_TL.play()
-  MASTER_TL.addPause('FLAME_ON', () => SOUNDS.MATCH.play())
-  MASTER_TL.addPause('LIGHTS_OUT', () => SOUNDS.TUNE.play())
-  BTN.addEventListener('click', () => {
-    console.log('clicked!');
-    BTN.setAttribute('disabled', true)
-    MASTER_TL.restart()
-    toggleAudio()
-  })
-  
-  SOUNDS.TUNE.muted = SOUNDS.MATCH.muted = SOUNDS.HORN.muted = SOUNDS.POP.muted = SOUNDS.CHEER.muted = SOUNDS.BLOW.muted = SOUNDS.ON.muted = true
-  
-  const toggleAudio = () => {
-    SOUNDS.TUNE.muted = SOUNDS.MATCH.muted = SOUNDS.POP.muted = SOUNDS.HORN.muted = SOUNDS.CHEER.muted = SOUNDS.BLOW.muted = SOUNDS.ON.muted = !SOUNDS
-      .BLOW.muted
+  resize() {
+    this.width = canvas.width = window.innerWidth
+    let center = this.width / 2 | 0
+    this.spawnA = center - center / 4 | 0
+    this.spawnB = center + center / 4 | 0
+    
+    this.height = canvas.height = window.innerHeight
+    this.spawnC = this.height * .1
+    this.spawnD = this.height * .5
+    
   }
   
-  document.querySelector('#volume').addEventListener('input', toggleAudio)
+  onClick(evt) {
+     let x = evt.clientX || evt.touches && evt.touches[0].pageX
+     let y = evt.clientY || evt.touches && evt.touches[0].pageY
+     
+     let count = random(3,5)
+     for(let i = 0; i < count; i++) this.fireworks.push(new Firework(
+        random(this.spawnA, this.spawnB),
+        this.height,
+        x,
+        y,
+        random(0, 260),
+        random(30, 110)))
+          
+     this.counter = -1
+     
+  }
   
+  update(delta) {
+    ctx.globalCompositeOperation = 'hard-light'
+    ctx.fillStyle = `rgba(20,20,20,${ 7 * delta })`
+    ctx.fillRect(0, 0, this.width, this.height)
+
+    ctx.globalCompositeOperation = 'lighter'
+    for (let firework of this.fireworks) firework.update(delta)
+
+    // if enough time passed... create new new firework
+    this.counter += delta * 3 // each second
+    if (this.counter >= 1) {
+      this.fireworks.push(new Firework(
+        random(this.spawnA, this.spawnB),
+        this.height,
+        random(0, this.width),
+        random(this.spawnC, this.spawnD),
+        random(0, 360),
+        random(30, 110)))
+      this.counter = 0
+    }
+
+    // remove the dead fireworks
+    if (this.fireworks.length > 1000) this.fireworks = this.fireworks.filter(firework => !firework.dead)
+
+  }
+}
+
+class Firework {
+  constructor(x, y, targetX, targetY, shade, offsprings) {
+    this.dead = false
+    this.offsprings = offsprings
+
+    this.x = x
+    this.y = y
+    this.targetX = targetX
+    this.targetY = targetY
+
+    this.shade = shade
+    this.history = []
+  }
+  update(delta) {
+    if (this.dead) return
+
+    let xDiff = this.targetX - this.x
+    let yDiff = this.targetY - this.y
+    if (Math.abs(xDiff) > 3 || Math.abs(yDiff) > 3) { // is still moving
+      this.x += xDiff * 2 * delta
+      this.y += yDiff * 2 * delta
+
+      this.history.push({
+        x: this.x,
+        y: this.y
+      })
+
+      if (this.history.length > 20) this.history.shift()
+
+    } else {
+      if (this.offsprings && !this.madeChilds) {
+        
+        let babies = this.offsprings / 2
+        for (let i = 0; i < babies; i++) {
+          let targetX = this.x + this.offsprings * Math.cos(PI2 * i / babies) | 0
+          let targetY = this.y + this.offsprings * Math.sin(PI2 * i / babies) | 0
+
+          birthday.fireworks.push(new Firework(this.x, this.y, targetX, targetY, this.shade, 0))
+
+        }
+
+      }
+      this.madeChilds = true
+      this.history.shift()
+    }
+    
+    if (this.history.length === 0) this.dead = true
+    else if (this.offsprings) { 
+        for (let i = 0; this.history.length > i; i++) {
+          let point = this.history[i]
+          ctx.beginPath()
+          ctx.fillStyle = 'hsl(' + this.shade + ',100%,' + i + '%)'
+          ctx.arc(point.x, point.y, 1, 0, PI2, false)
+          ctx.fill()
+        } 
+      } else {
+      ctx.beginPath()
+      ctx.fillStyle = 'hsl(' + this.shade + ',100%,50%)'
+      ctx.arc(this.x, this.y, 1, 0, PI2, false)
+      ctx.fill()
+    }
+
+  }
+}
+
+let canvas = document.getElementById('birthday')
+let ctx = canvas.getContext('2d')
+
+let then = timestamp()
+
+let birthday = new Birthday
+window.onresize = () => birthday.resize()
+document.onclick = evt => birthday.onClick(evt)
+document.ontouchstart = evt => birthday.onClick(evt)
+
+  ;(function loop(){
+  	requestAnimationFrame(loop)
+
+  	let now = timestamp()
+  	let delta = now - then
+
+    then = now
+    birthday.update(delta / 1000)
+  	
+
+  })()
