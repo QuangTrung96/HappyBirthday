@@ -9,23 +9,23 @@ const {
   const BTN = document.querySelector('.birthday-button__button')
   const SOUNDS = {
     CHEER: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/cheer.mp3'
+      './data/cheer.mp3'
     ),
     MATCH: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/match-strike-trimmed.mp3'
+      './data/match-strike-trimmed.mp3'
     ),
     TUNE: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/happy-birthday-trimmed.mp3'
+      './data/happy-birthday-trimmed.mp3'
     ),
-    ON: new Audio('https://assets.codepen.io/605876/switch-on.mp3'),
+    ON: new Audio('./data/switch-on.mp3'),
     BLOW: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/blow-out.mp3'
+      './data/blow-out.mp3'
     ),
     POP: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/pop-trimmed.mp3'
+      './data/pop-trimmed.mp3'
     ),
     HORN: new Audio(
-      'https://s3-us-west-2.amazonaws.com/s.cdpn.io/605876/horn.mp3'
+      './data/horn.mp3'
     ),
   }
   
